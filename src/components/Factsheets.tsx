@@ -1,6 +1,19 @@
 /* eslint-disable no-underscore-dangle */ // We use this because we have the _unit property
 /* eslint-disable sonarjs/no-duplicate-string */ // Make things easier to read
 
+/* welcome developers to tripsit's factsheets, brought to you by thc and spite. 
+
+this is a react component displays data from the tripsit drug database : https://github.com/tripsit/drugs
+
+if you want to modify the /information/ on this page, you need to modify the above drug database.
+check out that repo and make a new issue/pull request there, and this page will pull in that information.
+
+if you want to modify the /layout/ of this page, you need to modify this file.
+it's hosted within the greater tripsit website project: https://github.com/tripsit/website
+it displays the data using material react table: https://www.material-react-table.com
+pull requests are welcome! if you have any questions, feel free to ask in #dev on the tripsit discord: https://discord.gg/tripsit
+*/
+
 import React, { useMemo, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
@@ -41,12 +54,16 @@ import "aos/dist/aos.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-// Dynamically import ParticlesBg to prevent SSR errors
+// ---
+// particlesbg ssr fix
+// ---
 const AnimatedBg = dynamic(() => import("particles-bg"), {
   ssr: false,
 });
 
-// Info Panel with the transparent purple background
+// ---
+// factsheet info panel
+// ---
 const FactsheetInfoPanel = () => (
   <Grid item key="factsheetInfo" mt={2}>
     <Card
@@ -85,6 +102,9 @@ const FactsheetInfoPanel = () => (
             </Typography>
           </Grid>
           <Grid item xs={12} md={3}>
+            {/* ---
+            support buttons grid
+            --- */}
             <Grid container direction={{ xs: "row", md: "column" }} spacing={2}>
               <Grid item>
                 <KofiButton
@@ -107,10 +127,16 @@ const FactsheetInfoPanel = () => (
   </Grid>
 );
 
+// ---
+// category styler
+// ---
 const addCategoryStyle = (text: string | undefined) => {
   if (text === undefined) {
     return "";
   }
+  // ---
+  // category color map
+  // ---
   const categoryColors = {
     psychedelic: { backgroundColor: "#00A388" },
     opioid: { backgroundColor: "#C0D9AF" },
@@ -156,6 +182,9 @@ const addCategoryStyle = (text: string | undefined) => {
   });
 };
 
+// ---
+// infinite scroll page size
+// ---
 const PAGE_SIZE = 25;
 
 const Factsheets = () => {
@@ -163,10 +192,16 @@ const Factsheets = () => {
   const [visibleRowCount, setVisibleRowCount] = useState(PAGE_SIZE);
   const [isInfoVisible, setIsInfoVisible] = useState(false);
 
+  // ---
+  // aos init
+  // ---
   useEffect(() => {
     AOS.init({ duration: 1200, once: true });
   }, []);
 
+  // ---
+  // page theme
+  // ---
   const tripsitTheme = {
     pageBg: "#0c0c0d",
     primary: "#4a4de2",
@@ -182,6 +217,9 @@ const Factsheets = () => {
   } = useQuery<Drug[]>({
     queryKey: ["all-drugs-data"],
     queryFn: async () => {
+      // ---
+      // fetch drug data
+      // ---
       const response = await fetch(
         "https://raw.githubusercontent.com/TripSit/drugs/main/drugs.json",
       );
@@ -189,11 +227,17 @@ const Factsheets = () => {
     },
   });
 
+  // ---
+  // visible data for infinite scroll
+  // ---
   const visibleData = useMemo(
     () => allDrugs.slice(0, visibleRowCount),
     [allDrugs, visibleRowCount],
   );
 
+  // ---
+  // table column definitions
+  // ---
   const columns = useMemo<MRT_ColumnDef<Drug>[]>(
     () => [
       {
@@ -216,6 +260,9 @@ const Factsheets = () => {
         filterVariant: "text",
         enableGlobalFilter: false,
         size: 180,
+        // ---
+        // category cell renderer
+        // ---
         Cell: ({ cell }) => (
           <span>{addCategoryStyle(cell.getValue<string>())}</span>
         ),
@@ -227,6 +274,9 @@ const Factsheets = () => {
         filterVariant: "text",
         enableGlobalFilter: true,
         size: 900,
+        // ---
+        // summary cell renderer
+        // ---
         Cell: ({ cell }) => (
           <span>{addDictionaryDefs(cell.getValue<string>())}</span>
         ),
@@ -276,6 +326,9 @@ const Factsheets = () => {
     muiTableContainerProps: {
       ref: tableContainerRef,
       sx: { backgroundColor: "transparent", maxHeight: "80vh" },
+      // ---
+      // infinite scroll logic
+      // ---
       onScroll: (event) => {
         const { scrollHeight, scrollTop, clientHeight } = event.currentTarget;
         if (
@@ -361,11 +414,17 @@ const Factsheets = () => {
             Factsheet Info
           </Button>
         </Box>
+        {/* ---
+        info panel collapse
+        --- */}
         <Collapse in={isInfoVisible} timeout="auto" unmountOnExit>
           <FactsheetInfoPanel />
         </Collapse>
       </Box>
     ),
+    // ---
+    // detail panel renderer
+    // ---
     renderDetailPanel: ({ row }) => <DrugInfoCard drugData={row.original} />,
     renderBottomToolbar: () => (
       <Box
@@ -385,6 +444,9 @@ const Factsheets = () => {
         )}
       </Box>
     ),
+    // ---
+    // table state management
+    // ---
     state: {
       isLoading,
       showAlertBanner: isError,
@@ -392,6 +454,9 @@ const Factsheets = () => {
     },
   });
 
+  // ---
+  // custom scrollbar styles
+  // ---
   const scrollbarStyles = `
     ::-webkit-scrollbar {
       width: 10px;
@@ -428,6 +493,9 @@ const Factsheets = () => {
   );
 };
 
+// ---
+// page wrapper
+// ---
 const ExamplePage = () => (
   <div data-bs-theme="dark">
     <Header />
