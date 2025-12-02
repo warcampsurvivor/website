@@ -13,7 +13,6 @@ import {
   Paper,
   GlobalStyles,
   Grid,
-  Chip,
   Card,
   CardContent,
   Link,
@@ -29,7 +28,18 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Collapse
+  Collapse,
+  AppBar,
+  Toolbar,
+  Container,
+  Menu,
+  MenuItem,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  Divider,
+  ListSubheader
 } from "@mui/material";
 
 // Standard MUI Icons
@@ -48,6 +58,9 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import BiotechIcon from "@mui/icons-material/Biotech";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 // Import Data
 import combosDataRaw from './combos.json';
@@ -128,7 +141,6 @@ const getAppleTheme = (mode: "light" | "dark") =>
       MuiCssBaseline: { 
         styleOverrides: { 
           body: { backgroundColor: mode === "light" ? "#F5F5F7" : "#000000" },
-          // GLOBAL SCROLLBAR THEME
           "*::-webkit-scrollbar": { width: "8px", height: "8px" },
           "*::-webkit-scrollbar-track": { background: "transparent" },
           "*::-webkit-scrollbar-thumb": {
@@ -170,6 +182,210 @@ const MeshGradient = () => {
     )
 }
 
+// --- CLASSIC TRIPSIT HEADER COMPONENT ---
+const TripSitHeader = ({ toggleColorMode, mode }: { toggleColorMode: () => void, mode: 'light' | 'dark' }) => {
+    const [anchorElResources, setAnchorElResources] = useState<null | HTMLElement>(null);
+    const [anchorElGuides, setAnchorElGuides] = useState<null | HTMLElement>(null);
+    const [mobileOpen, setMobileOpen] = useState(false);
+
+    const handleOpenResources = (event: React.MouseEvent<HTMLElement>) => setAnchorElResources(event.currentTarget);
+    const handleCloseResources = () => setAnchorElResources(null);
+    
+    const handleOpenGuides = (event: React.MouseEvent<HTMLElement>) => setAnchorElGuides(event.currentTarget);
+    const handleCloseGuides = () => setAnchorElGuides(null);
+
+    // Style mimicking the bootstrap header provided
+    const navLinkStyle = {
+        color: '#rgba(255,255,255,0.85)',
+        textDecoration: 'none',
+        fontWeight: 400,
+        fontSize: '1rem',
+        mx: 1.5,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        '&:hover': { color: '#ffffff', opacity: 1 }
+    };
+
+    const logoUrl = "https://tripsit.me/wp-content/uploads/2018/08/tripsit-logo-v7.png";
+
+    return (
+        <AppBar position="fixed" sx={{ bgcolor: '#212529', boxShadow: 'none', borderBottom: '1px solid #333', zIndex: 1201 }}>
+            <Container maxWidth="xl">
+                <Toolbar disableGutters sx={{ minHeight: '70px', justifyContent: 'space-between' }}>
+                    
+                    {/* Logo */}
+                    <Link href="https://tripsit.me" sx={{ display: 'flex', alignItems: 'center', mr: 2 }}>
+                        <Box component="img" src={logoUrl} alt="TripSit" sx={{ height: 35 }} />
+                    </Link>
+
+                    {/* Desktop Navigation */}
+                    <Box sx={{ display: { xs: 'none', xl: 'flex' }, alignItems: 'center', flexGrow: 1, justifyContent: 'center' }}>
+                        <Link href="https://tripsit.me#hero" sx={{ ...navLinkStyle, color: '#fff' }}>Home</Link>
+                        <Link href="https://tripsit.me#about" sx={navLinkStyle}>About</Link>
+
+                        {/* Resources Dropdown */}
+                        <Box>
+                            <Link sx={navLinkStyle} onClick={handleOpenResources}>
+                                Resources <KeyboardArrowDownIcon fontSize="small" sx={{ ml: 0.5 }} />
+                            </Link>
+                            <Menu
+                                anchorEl={anchorElResources}
+                                open={Boolean(anchorElResources)}
+                                onClose={handleCloseResources}
+                                PaperProps={{ sx: { bgcolor: '#212529', color: '#fff', mt: 1, minWidth: 220, border: '1px solid #444' } }}
+                                MenuListProps={{ sx: { py: 0 } }}
+                            >
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px', mt: 1 }}>Drug Info</ListSubheader>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Main_Page" sx={{ fontSize: '0.9rem' }}>Wiki</MenuItem>
+                                <MenuItem component="a" href="https://tripsit.me/factsheets" sx={{ fontSize: '0.9rem' }}>Factsheets</MenuItem>
+                                <MenuItem component="a" href="https://combo.tripsit.me" sx={{ fontSize: '0.9rem' }}>Comboapp</MenuItem>
+                                <MenuItem component="a" href="https://tripsit.me#faq" sx={{ fontSize: '0.9rem' }}>Printing Information</MenuItem>
+                                <MenuItem component="a" href="https://www.reddit.com/r/Drugs/comments/131q1yb/the_drug_users_bible_download_it_free_of_charge/" sx={{ fontSize: '0.9rem' }}>Drug User's Handbook</MenuItem>
+                                
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px' }}>Calculators</ListSubheader>
+                                <MenuItem component="a" href="https://dxm.tripsit.me" sx={{ fontSize: '0.9rem' }}>DXM Dosage</MenuItem>
+                                <MenuItem component="a" href="https://volume.tripsit.me" sx={{ fontSize: '0.9rem' }}>Volumetric</MenuItem>
+                                <MenuItem component="a" href="https://benzos.tripsit.me" sx={{ fontSize: '0.9rem' }}>Benzo Conversion</MenuItem>
+
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px' }}>Test Kits</ListSubheader>
+                                <MenuItem component="a" href="https://dancesafe.org/product-category/testing-strips/" sx={{ fontSize: '0.9rem' }}>DanceSafe (Worldwide)</MenuItem>
+                                <MenuItem component="a" href="https://protestkit.eu/shop/?coupon_code=tripsit" sx={{ fontSize: '0.9rem' }}>ProTest (Europe)</MenuItem>
+                                
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <MenuItem component="a" href="https://learn.tripsit.me" sx={{ fontSize: '0.9rem', mt: 1 }}>Learning Platform</MenuItem>
+                                <MenuItem component="a" href="https://play.google.com/store/apps/details?id=me.tripsit.mobile&hl=en_US&gl=US" sx={{ fontSize: '0.9rem' }}>Android App</MenuItem>
+                                <MenuItem component="a" href="https://uptime.tripsit.me/status/default" sx={{ fontSize: '0.9rem' }}>Service Status</MenuItem>
+                            </Menu>
+                        </Box>
+
+                        {/* Guides Dropdown */}
+                        <Box>
+                            <Link sx={navLinkStyle} onClick={handleOpenGuides}>
+                                Guides <KeyboardArrowDownIcon fontSize="small" sx={{ ml: 0.5 }} />
+                            </Link>
+                            <Menu
+                                anchorEl={anchorElGuides}
+                                open={Boolean(anchorElGuides)}
+                                onClose={handleCloseGuides}
+                                PaperProps={{ sx: { bgcolor: '#212529', color: '#fff', mt: 1, minWidth: 220, border: '1px solid #444' } }}
+                                MenuListProps={{ sx: { py: 0 } }}
+                            >
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px', mt: 1 }}>Harm Reduction</ListSubheader>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Common_Misconceptions_About_Psychedelics" sx={{ fontSize: '0.9rem' }}>Psychedelic Myths</MenuItem>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Test_Kits" sx={{ fontSize: '0.9rem' }}>Test Kits</MenuItem>
+
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px' }}>TripSitting</ListSubheader>
+                                <MenuItem component="a" href="https://learn.tripsit.me" sx={{ fontSize: '0.9rem' }}>Intro to TripSitting</MenuItem>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/How_To_Tripsit_In_Real_Life" sx={{ fontSize: '0.9rem' }}>TripSit in Real Life</MenuItem>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/How_To_Deal_With_A_Bad_Trip" sx={{ fontSize: '0.9rem' }}>Deal with a Bad Trip</MenuItem>
+
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px' }}>Recovery</ListSubheader>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Quick_Guide_to_Stimulant_Comedowns" sx={{ fontSize: '0.9rem' }}>Stimulant Comedowns</MenuItem>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Guide_to_Withdrawals" sx={{ fontSize: '0.9rem' }}>Withdrawals</MenuItem>
+
+                                <Divider sx={{ bgcolor: '#444' }} />
+                                <ListSubheader sx={{ bgcolor: 'transparent', color: '#888', textTransform: 'uppercase', fontSize: '0.75rem', fontWeight: 700, lineHeight: '30px' }}>Dosing</ListSubheader>
+                                <MenuItem component="a" href="https://wiki.tripsit.me/wiki/Quick_Guide_to_Volumetric_Dosing" sx={{ fontSize: '0.9rem' }}>Volumetric Dosing</MenuItem>
+                            </Menu>
+                        </Box>
+
+                        <Link href="https://tripsit.me#cta" sx={navLinkStyle}>Volunteer</Link>
+                        <Link href="https://tripsit.me#faq" sx={navLinkStyle}>FAQ</Link>
+                        <Link href="https://updates.tripsit.me" sx={navLinkStyle}>Updates</Link>
+                        <Link href="https://tripsit.me/appeal" sx={navLinkStyle}>Ban Appeal</Link>
+                    </Box>
+
+                    {/* Action Buttons */}
+                    <Box sx={{ display: { xs: 'none', lg: 'flex' }, alignItems: 'center', gap: 2 }}>
+                        <Button 
+                            variant="contained" 
+                            href="https://discord.gg/tripsit"
+                            sx={{ 
+                                bgcolor: '#5865F2', // Discord Blurple
+                                color: '#ffffff',
+                                textTransform: 'none',
+                                fontWeight: 500,
+                                px: 2,
+                                '&:hover': { bgcolor: '#4752c4' }
+                            }}
+                        >
+                            Join Discord
+                        </Button>
+                        <Button 
+                            variant="contained" 
+                            href="https://tripsit.me/webchat"
+                            sx={{ 
+                                bgcolor: '#0d6efd', // Bootstrap Primary Blue
+                                color: '#ffffff',
+                                textTransform: 'none',
+                                fontWeight: 500,
+                                px: 2,
+                                '&:hover': { bgcolor: '#0b5ed7' }
+                            }}
+                        >
+                            Start Webchat
+                        </Button>
+                        
+                        {/* Subtle Theme Toggle */}
+                        <Tooltip title="Toggle Light/Dark Mode">
+                            <IconButton onClick={toggleColorMode} sx={{ color: '#aaa', '&:hover': { color: '#fff' } }}>
+                                {mode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
+
+                    {/* Mobile Menu Icon */}
+                    <Box sx={{ display: { xs: 'flex', xl: 'none' }, alignItems: 'center' }}>
+                         <IconButton onClick={toggleColorMode} sx={{ color: '#aaa', mr: 1 }}>
+                            {mode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
+                        </IconButton>
+                        <IconButton onClick={() => setMobileOpen(true)} sx={{ color: '#fff' }}>
+                            <MenuIcon />
+                        </IconButton>
+                    </Box>
+                </Toolbar>
+            </Container>
+
+            {/* Mobile Drawer */}
+            <Drawer
+                anchor="right"
+                open={mobileOpen}
+                onClose={() => setMobileOpen(false)}
+                PaperProps={{ sx: { width: 300, bgcolor: '#212529', color: 'white' } }}
+            >
+                <Box sx={{ p: 2, display: 'flex', justifyContent: 'flex-end' }}>
+                    <IconButton onClick={() => setMobileOpen(false)} sx={{ color: 'white' }}><CloseIcon /></IconButton>
+                </Box>
+                <List>
+                    <ListItemButton component="a" href="https://tripsit.me"><ListItemText primary="Home" /></ListItemButton>
+                    <ListItemButton component="a" href="https://tripsit.me#about"><ListItemText primary="About" /></ListItemButton>
+                    <ListItemButton onClick={() => setAnchorElResources(anchorElResources ? null : document.body)}>
+                        <ListItemText primary="Resources" />
+                        <ChevronRightIcon fontSize="small" />
+                    </ListItemButton>
+                    <ListItemButton onClick={() => setAnchorElGuides(anchorElGuides ? null : document.body)}>
+                        <ListItemText primary="Guides" />
+                        <ChevronRightIcon fontSize="small" />
+                    </ListItemButton>
+                    <Divider sx={{ bgcolor: '#444', my: 1 }} />
+                    <ListItemButton component="a" href="https://discord.gg/tripsit" sx={{ bgcolor: '#5865F2', mx: 2, borderRadius: 1, my: 1, '&:hover': { bgcolor: '#4752c4' } }}>
+                        <ListItemText primary="Join Discord" sx={{ textAlign: 'center', fontWeight: 'bold' }} />
+                    </ListItemButton>
+                    <ListItemButton component="a" href="https://tripsit.me/webchat" sx={{ bgcolor: '#0d6efd', mx: 2, borderRadius: 1, '&:hover': { bgcolor: '#0b5ed7' } }}>
+                        <ListItemText primary="Start Webchat" sx={{ textAlign: 'center', fontWeight: 'bold' }} />
+                    </ListItemButton>
+                </List>
+            </Drawer>
+        </AppBar>
+    );
+};
+
 // --- RISK HELPERS ---
 const RISK_COLORS: Record<string, { dark: string; light: string; bgLight: string; bgDark: string; icon: React.ElementType }> = {
     "Low Risk": { dark: "#30D158", light: "#34C759", bgLight: "#E8FBEB", bgDark: "rgba(48, 209, 88, 0.15)", icon: CheckCircleOutlineIcon },
@@ -196,7 +412,7 @@ const RiskLegendModal = ({ open, onClose }: { open: boolean, onClose: () => void
             maxWidth="md" 
             fullWidth 
             TransitionComponent={Zoom}
-            sx={{ '& .MuiDialogContent-root': { scrollbarColor: 'auto' }}}
+            sx={{ '& .MuiDialogContent-root': { scrollbarColor: 'auto' }, zIndex: 1300 }}
         >
             <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 3 }}>
                 <Typography variant="h5" fontWeight={800}>Risk Guide</Typography>
@@ -392,7 +608,7 @@ const InteractionChecker = () => {
     }, [selectedDrugs]);
 
     return (
-        <Box sx={{ p: { xs: 2, md: 4 }, maxWidth: 1600, margin: "0 auto" }}>
+        <Box sx={{ p: { xs: 2, md: 4 }, pt: { xs: 12, md: 14 }, maxWidth: 1600, margin: "0 auto" }}>
             
             {/* Header */}
             <Box sx={{ mb: 4, display: 'flex', flexDirection: {xs: 'column', md: 'row'}, justifyContent: 'space-between', alignItems: {md: 'center'}, gap: 2 }}>
@@ -432,7 +648,7 @@ const InteractionChecker = () => {
                 {/* LEFT: Analyzer */}
                 <Grid item xs={12} md={5} lg={4} sx={{ 
                     position: { md: 'sticky' }, 
-                    top: 24, 
+                    top: 100, 
                     height: 'fit-content', 
                     order: { xs: 1, md: 1 }, 
                     zIndex: 10 
@@ -470,7 +686,7 @@ const InteractionChecker = () => {
                 <Grid item xs={12} md={7} lg={8} sx={{ order: { xs: 2, md: 2 } }}>
                     {/* Search Bar */}
                     <Box sx={{ 
-                        position: 'sticky', top: {xs: 10, md: 0}, zIndex: 5, mb: 3,
+                        position: 'sticky', top: {xs: 70, md: 80}, zIndex: 5, mb: 3,
                         bgcolor: alpha(theme.palette.background.default, 0.8),
                         backdropFilter: 'blur(10px)',
                         borderRadius: '16px',
@@ -564,17 +780,10 @@ const DrugInteractionChecker = () => {
                 'a:hover': { opacity: 0.7 }
             }} />
             <MeshGradient />
-            <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 9999 }}>
-                <Tooltip title="Toggle Theme">
-                    <IconButton onClick={toggleColorMode} sx={{ 
-                        bgcolor: alpha(theme.palette.background.paper, 0.5), backdropFilter: 'blur(10px)', 
-                        border: `1px solid ${theme.palette.divider}`,
-                        '&:hover': { bgcolor: alpha(theme.palette.background.paper, 0.8) }
-                    }}>
-                        {mode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}
-                    </IconButton>
-                </Tooltip>
-            </Box>
+            
+            {/* New TripSit Header Component */}
+            <TripSitHeader toggleColorMode={toggleColorMode} mode={mode} />
+
             <InteractionChecker />
         </ThemeProvider>
     </ColorModeContext.Provider>
